@@ -24,6 +24,7 @@ public class SensorService {
     public Sensor findOne(int id) {
         return sensorRepository.findById(id).orElse(null);
     }
+    public Sensor findByName(String name) {return sensorRepository.findBySensorName(name);}
 
     @Transactional
     public void save(Sensor sensor) {

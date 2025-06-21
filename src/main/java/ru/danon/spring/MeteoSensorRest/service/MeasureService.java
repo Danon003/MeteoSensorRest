@@ -19,10 +19,13 @@ public class MeasureService {
 
     private final MeasureRepository measureRepository;
     private final SensorRepository sensorRepository;
+    private final SensorService sensorService;
+
     @Autowired
-    public MeasureService(MeasureRepository measureRepository, SensorRepository sensorRepository) {
+    public MeasureService(MeasureRepository measureRepository, SensorRepository sensorRepository, SensorService sensorService) {
         this.measureRepository = measureRepository;
         this.sensorRepository = sensorRepository;
+        this.sensorService = sensorService;
     }
 
     public List<Measure> findAll() {
@@ -34,17 +37,7 @@ public class MeasureService {
 
     @Transactional
     public void save(Measure measure) {
-        Sensor sensor = measure.getSensor();
 
-
-        if (sensor != null && sensor.getId() == null) {
-            Sensor existingSensor = sensorRepository.findBySensorName(sensor.getSensorName());
-            if (existingSensor != null) {
-                measure.setSensor(existingSensor);
-            } else {
-                sensorRepository.save(sensor);
-            }
-        }
         enrichMeasure(measure);
         measureRepository.save(measure);
     }
@@ -59,6 +52,8 @@ public class MeasureService {
         measureRepository.saveAll(measures);
     }
     private void enrichMeasure(Measure measure){
+        measure.setSensor(sensorService.findByName(measure.getSensor().getSensorName()));
+
         measure.setCreated_at(LocalDateTime.now());
     }
 }

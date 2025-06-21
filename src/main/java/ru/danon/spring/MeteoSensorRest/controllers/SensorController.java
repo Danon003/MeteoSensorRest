@@ -6,16 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.danon.spring.MeteoSensorRest.dto.SensorDTO;
 import ru.danon.spring.MeteoSensorRest.models.Sensor;
 import ru.danon.spring.MeteoSensorRest.service.SensorService;
-import ru.danon.spring.MeteoSensorRest.util.SensorErrorResponse;
-import ru.danon.spring.MeteoSensorRest.util.SensorNotCreatedException;
+import ru.danon.spring.MeteoSensorRest.util.MeasureErrorResponse;
+import ru.danon.spring.MeteoSensorRest.util.MeasureNotCreatedException;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.danon.spring.MeteoSensorRest.util.ErrorsUtil.returnErrorsToClient;
 
 @RestController
 @RequestMapping("/sensors")
@@ -40,23 +42,16 @@ public class SensorController {
     @PostMapping("/registration")
     public ResponseEntity<HttpStatus> registerSensor(@RequestBody @Valid SensorDTO sensorDTO,
                                                      BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new SensorNotCreatedException(errorMessage.toString());
-        }
+        if (bindingResult.hasErrors())
+            returnErrorsToClient(bindingResult);
+
         sensorService.save(convertToSensor(sensorDTO));
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @ExceptionHandler
-    private ResponseEntity<SensorErrorResponse> handleException(SensorNotCreatedException e) {
-        SensorErrorResponse response = new SensorErrorResponse(
+    private ResponseEntity<MeasureErrorResponse> handleException(MeasureNotCreatedException e) {
+        MeasureErrorResponse response = new MeasureErrorResponse(
                 e.getMessage(),
                 System.currentTimeMillis()
         );

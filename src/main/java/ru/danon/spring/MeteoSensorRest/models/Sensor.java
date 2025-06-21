@@ -2,6 +2,7 @@ package ru.danon.spring.MeteoSensorRest.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ public class Sensor {
     private Integer id;
 
     @Column(name = "sensor_name", unique = true)
+    @Size(min = 2, max = 100, message = "Имя сенсора должно быть не меньше 2 и не больше 100 символов")
     @NotEmpty(message = "Название сенсора не должно быть пустым!")
     private String sensorName;
 
@@ -50,4 +52,6 @@ public class Sensor {
     public void setMeasures(List<Measure> measures) {
         this.measures = measures;
     }
+
+
 }

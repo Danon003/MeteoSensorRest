@@ -5,19 +5,17 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.danon.spring.MeteoSensorRest.dto.MeasureDTO;
+import ru.danon.spring.MeteoSensorRest.dto.MeasuresResponse;
 import ru.danon.spring.MeteoSensorRest.models.Measure;
 import ru.danon.spring.MeteoSensorRest.service.MeasureService;
 import ru.danon.spring.MeteoSensorRest.util.MeasureErrorResponse;
 import ru.danon.spring.MeteoSensorRest.util.MeasureNotCreatedException;
-
-
 import java.util.List;
 import java.util.stream.Collectors;
+import static ru.danon.spring.MeteoSensorRest.util.ErrorsUtil.returnErrorsToClient;
 
 @RestController
 @RequestMapping("/measurements")
@@ -32,10 +30,10 @@ public class MeasureController {
     }
 
     @GetMapping
-    public List<MeasureDTO> getAllMeasures() {
-        return measureService.findAll().stream()
+    public MeasuresResponse getAllMeasures() {
+        return new MeasuresResponse(measureService.findAll().stream()
                 .map(this::convertToMeasureDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/rainyDaysCount")
@@ -46,16 +44,8 @@ public class MeasureController {
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> add(@RequestBody @Valid MeasureDTO measureDTO,
                                           BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            StringBuilder errorMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for (FieldError error : errors) {
-                errorMessage.append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new MeasureNotCreatedException(errorMessage.toString());
-        }
+        if (bindingResult.hasErrors())
+            returnErrorsToClient(bindingResult);
 
         measureService.save(convertToMeasure(measureDTO));
         return ResponseEntity.ok(HttpStatus.OK);

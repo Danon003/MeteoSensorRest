@@ -17,6 +17,7 @@ public class SensorDTO {
     public void setSensorName(String sensorName) {
         this.sensorName = sensorName;
     }
+    public SensorDTO() {}
     public SensorDTO(String sensorName) {
         this.sensorName = sensorName;
     }

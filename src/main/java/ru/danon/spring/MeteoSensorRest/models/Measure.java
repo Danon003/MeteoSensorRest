@@ -18,9 +18,11 @@ public class Measure {
     @Column(name = "value", precision = 4, scale = 1, nullable = false)
     @DecimalMin(value = "-100.0", message = "температура должна быть больше, чем -100.0")
     @DecimalMax(value = "100.0", message = "температура должна быть меньше, чем 100.0")
+    @NotNull
     private BigDecimal value;
 
     @Column(name = "raining")
+    @NotNull
     private boolean raining;
 
     @ManyToOne

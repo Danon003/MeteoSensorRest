@@ -1,6 +1,5 @@
 package ru.danon.spring.MeteoSensorRest.controllers;
 
-
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.XYChart;
@@ -11,11 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.danon.spring.MeteoSensorRest.dto.MeasureDTO;
-import ru.danon.spring.MeteoSensorRest.dto.SensorDTO;
 import ru.danon.spring.MeteoSensorRest.models.Measure;
 import ru.danon.spring.MeteoSensorRest.models.Sensor;
 import ru.danon.spring.MeteoSensorRest.service.MeasureService;
-import ru.danon.spring.MeteoSensorRest.service.SensorService;
+
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -24,18 +22,16 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RestController
-@RequestMapping("/client")
-public class Client {
+@RequestMapping("/data")
+public class DataController {
     private final MeasureService measureService;
-    private final ModelMapper modelMapper;
+
     @Autowired
-    public Client(MeasureService measureService, ModelMapper modelMapper) {
+    public DataController(MeasureService measureService) {
         this.measureService = measureService;
-        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/add1000Metrics")
